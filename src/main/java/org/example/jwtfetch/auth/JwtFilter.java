@@ -1,12 +1,16 @@
 package org.example.jwtfetch.auth;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.jwtfetch.config.AuthProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,6 +23,23 @@ import java.io.IOException;
 @EnableConfigurationProperties(AuthProperties.class)
 public class JwtFilter extends OncePerRequestFilter {
     private final AuthProperties p;
+    private String extractToken(HttpServletRequest request) {
+        // header <- 외부로 openapi 형식으로 할 때
+        // cookie <- 내부에서 호출할 때
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null; // 어차피 claims 시에 문제가 생기므로...
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("accessToken")) {
+                System.out.println("cookie: %s".formatted(cookie.getValue()));
+                return cookie.getValue(); // JWT
+            }
+        }
+        return null;
+    }
+
+    private Claims extractClaims(String token) {
+        return null;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -26,8 +47,19 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         System.out.println("JwtFilter.doFilterInternal");
         try {
+            // 1. extractToken (cookie, header)
+            String token = extractToken(request); // request -> cookie, header...
+            // 2. extractClaims
+            Claims claims = extractClaims(token); // jwtProvider -> claims
+            // 3. Authentication
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    claims.getSubject(),
+                    null,
+                    AuthorityUtils.createAuthorityList("ROLE_USER")
+            );
             SecurityContext context = SecurityContextHolder.getContext();
-            context.setAuthentication(null);
+//            context.setAuthentication(null);
+            context.setAuthentication(auth);
         } catch (Exception e) {
             e.printStackTrace();
             SecurityContextHolder.clearContext();
