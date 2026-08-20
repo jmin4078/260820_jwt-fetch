@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -52,6 +53,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private String extractToken(HttpServletRequest request) {
         // header <- 외부로 openapi 형식으로 할 때
+        String authHeader = request.getHeader("Authorization");
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7); // 'Bearer '
+            if (!StringUtils.hasText(token)) {
+                System.out.println("header: %s".formatted(token));
+                return token;
+            }
+        }
         // cookie <- 내부에서 호출할 때
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return null; // 어차피 claims 시에 문제가 생기므로...

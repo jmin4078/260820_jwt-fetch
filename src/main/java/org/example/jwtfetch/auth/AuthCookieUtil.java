@@ -12,6 +12,12 @@ import org.springframework.stereotype.Component;
 public class AuthCookieUtil {
     private final AuthProperties p;
 
+    public ResponseCookie deleteAccessTokenCookie() {
+        return ResponseCookie.from("accessToken", "")
+                .maxAge(0)
+                .build();
+    }
+
     public ResponseCookie createAccessTokenCookie(String token) {
         return ResponseCookie.from("accessToken", token)
                 // 보안
