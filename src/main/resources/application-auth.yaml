@@ -1,4 +1,6 @@
-# JWT...
+app:
+  auth:
+    encoding-id: argon2
 ---
 spring:
   config:
