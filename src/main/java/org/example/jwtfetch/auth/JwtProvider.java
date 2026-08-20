@@ -1,5 +1,6 @@
 package org.example.jwtfetch.auth;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,13 @@ public class JwtProvider {
                 .expiration(expiration)
                 .subject(username)
                 .compact();
+    }
+
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token) // exception
+                .getPayload();
     }
 }

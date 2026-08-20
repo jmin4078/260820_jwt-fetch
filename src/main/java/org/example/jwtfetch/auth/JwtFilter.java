@@ -7,8 +7,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.example.jwtfetch.config.AuthProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,26 +18,9 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(AuthProperties.class)
+//@EnableConfigurationProperties(AuthProperties.class)
 public class JwtFilter extends OncePerRequestFilter {
-    private final AuthProperties p;
-    private String extractToken(HttpServletRequest request) {
-        // header <- 외부로 openapi 형식으로 할 때
-        // cookie <- 내부에서 호출할 때
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null; // 어차피 claims 시에 문제가 생기므로...
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("accessToken")) {
-                System.out.println("cookie: %s".formatted(cookie.getValue()));
-                return cookie.getValue(); // JWT
-            }
-        }
-        return null;
-    }
-
-    private Claims extractClaims(String token) {
-        return null;
-    }
+//    private final AuthProperties p;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -60,11 +41,32 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContext context = SecurityContextHolder.getContext();
 //            context.setAuthentication(null);
             context.setAuthentication(auth);
+            System.out.println("인증 완료");
         } catch (Exception e) {
             e.printStackTrace();
             SecurityContextHolder.clearContext();
         }
         // 무조건 실행이 되어야함
         filterChain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        // header <- 외부로 openapi 형식으로 할 때
+        // cookie <- 내부에서 호출할 때
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null; // 어차피 claims 시에 문제가 생기므로...
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("accessToken")) {
+                System.out.println("cookie: %s".formatted(cookie.getValue()));
+                return cookie.getValue(); // JWT
+            }
+        }
+        return null;
+    }
+
+    private final JwtProvider jwtProvider;
+
+    private Claims extractClaims(String token) {
+        return jwtProvider.parseToken(token);
     }
 }
