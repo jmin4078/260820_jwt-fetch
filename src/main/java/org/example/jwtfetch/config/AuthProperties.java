@@ -2,7 +2,7 @@ package org.example.jwtfetch.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import javax.xml.datatype.Duration;
+import java.time.Duration;
 
 @ConfigurationProperties(prefix = "app.auth")
 public record AuthProperties(
