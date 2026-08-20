@@ -40,4 +40,12 @@ public class JwtProvider {
                 .parseSignedClaims(token) // exception
                 .getPayload();
     }
+
+    public RefreshTokenDetail createRefreshToken(String username) {
+        // parse는 공용으로 쓰고 claims 내부의 값으로 refresh token 인지 여부를 판단
+        return null;
+    }
+
+    public record RefreshTokenDetail(String jti, String username, long ttl) {
+    }
 }
