@@ -13,7 +13,7 @@
 <section>
     <form id="loginForm">
         <label>유저ID <input name="username"/></label><br>
-        <label>비밀번호 <input type="password" name="password" /></label><br>
+        <label>비밀번호 <input type="password" name="password"/></label><br>
         <button>로그인</button>
     </form>
 </section>
@@ -30,6 +30,8 @@
             body: JSON.stringify(Object.fromEntries(formData))
         });
         const token = await response.text();
+        localStorage.setItem("accessToken", token); // 프런트엔드가 별도로 존재하는 경우에
+        // WebStorage -> XSS 공격에 취약하므로 -> 가능한 짧은 시간만 유지하거나 아니면 쿠키/상태관리 사용
         console.log(token);
     })
 </script>
