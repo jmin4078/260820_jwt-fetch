@@ -2,10 +2,7 @@ package org.example.jwtfetch.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Table(name = "user_account")
 @Entity
@@ -15,5 +12,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserAccount extends BaseEntity {
     private String username;
+    @Setter
     private String password;
 }
