@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: jwt-fetch
+  profiles:
+    active: dev,db,auth
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  thymeleaf:
+    cache: false
