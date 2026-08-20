@@ -31,4 +31,8 @@ public class MainController {
         userAccountService.signUp(dto.toEntity());
         return "redirect:/";
     }
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 }
